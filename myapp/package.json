@@ -3,9 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": " node ./bin/www"
+    "start": " node ./bin/www",
+    "debug-linux": "DEBUG=myapp:* npm start",
+    "debug-win": "set DEBUG=myapp:* & npm start",
+    "babel-edit": "npx babel --watch  src --out-dir public/js --presets react-app/prod",
+    "babel": "npx babel src --out-dir public/js --presets react-app/prod",
+    "deploy": "npm run babel & npm start"
   },
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -13,5 +20,11 @@
     "morgan": "~1.9.1",
     "pug": "^2.0.3",
     "sass": "^1.20.1"
-  }
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
