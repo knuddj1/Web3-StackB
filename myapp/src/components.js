@@ -1,5 +1,12 @@
 'use strict';
 
+String.prototype.format = function () {
+    var i = 0, args = arguments;
+    return this.replace(/{}/g, function () {
+      return typeof args[i] != 'undefined' ? args[i++] : '';
+    });
+};
+
 function addToLocalStorage(res){
     let countries = {};
     res.forEach(dset => {
@@ -12,7 +19,8 @@ function addToLocalStorage(res){
                     if(yearNum in countries[country_name]){
                         countries[country_name][yearNum][dataset_name] = country.payload;
                     } else{
-                        countries[country_name][yearNum] = {dataset_name : country.payload}
+                        countries[country_name][yearNum] = {}
+                        countries[country_name][yearNum][dataset_name] = country.payload;
                     }
                 } else{
                     countries[country_name] = {}
@@ -20,7 +28,8 @@ function addToLocalStorage(res){
                     if(yearNum in countries[country_name]){
                         countries[country_name][yearNum][dataset_name] = country.payload;
                     } else{
-                        countries[country_name][yearNum] = {dataset_name : country.payload}
+                        countries[country_name][yearNum] = {}
+                        countries[country_name][yearNum][dataset_name] = country.payload;
                     }
                 } 
             })
@@ -43,7 +52,7 @@ class SelectionBox extends React.Component {
       this.yearsSlider = React.createRef();
     }
   
-    componentDidMount() { 
+    componentDidMount() {
         if (localStorage.getItem('countries') === null) {
             fetch('http://127.0.0.1/get_dataset')
             .then(res => res.json())
@@ -115,6 +124,7 @@ class YearsSlider extends React.Component {
             min: 0,
             max: 100,
             value: 0,
+            country: null,
         };
     }
     
@@ -126,6 +136,7 @@ class YearsSlider extends React.Component {
             min: min,
             max: Math.max.apply(Math, years),
             value: min,
+            country: country_name,
         });
     }
 
@@ -134,7 +145,18 @@ class YearsSlider extends React.Component {
         this.setState({
             value: slider.value,
         })
-    }
+        const county_name = this.state.country;
+        const country_data = JSON.parse(localStorage.getItem('countries'))[county_name];
+        const year_data = country_data[slider.value];
+        
+        const textAreaTitle = document.getElementById('text-area-title').innerHTML = county_name;
+
+        let textAreaString = ''
+        Object.entries(year_data).forEach(values =>{
+            textAreaString += '{}: {} \n \n'.format(values[0], values[1])
+        })
+        const textArea = document.getElementById('text-area').innerHTML = textAreaString;
+    }   
 
     render(){
         const {min, max, value} = this.state;
@@ -150,23 +172,4 @@ class YearsSlider extends React.Component {
 
 let selectionBox = document.querySelector('#selection-box');
 ReactDOM.render(<SelectionBox />, selectionBox);
-
-class TextArea extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-        };
-    }
-
-    render(){
-        return (
-            <div className="TextArea">
-                <p>PLACEHOLDER DOG</p>
-            </div>
-        );
-    }
-}
-
-let textArea = document.querySelector('#text-area');
-ReactDOM.render(<TextArea />, textArea);
   

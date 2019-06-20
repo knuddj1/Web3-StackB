@@ -8,6 +8,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+String.prototype.format = function () {
+    var i = 0,
+        args = arguments;
+    return this.replace(/{}/g, function () {
+        return typeof args[i] != 'undefined' ? args[i++] : '';
+    });
+};
+
 function addToLocalStorage(res) {
     var countries = {};
     res.forEach(function (dset) {
@@ -20,7 +28,8 @@ function addToLocalStorage(res) {
                     if (yearNum in countries[country_name]) {
                         countries[country_name][yearNum][dataset_name] = country.payload;
                     } else {
-                        countries[country_name][yearNum] = { dataset_name: country.payload };
+                        countries[country_name][yearNum] = {};
+                        countries[country_name][yearNum][dataset_name] = country.payload;
                     }
                 } else {
                     countries[country_name] = {};
@@ -28,7 +37,8 @@ function addToLocalStorage(res) {
                     if (yearNum in countries[country_name]) {
                         countries[country_name][yearNum][dataset_name] = country.payload;
                     } else {
-                        countries[country_name][yearNum] = { dataset_name: country.payload };
+                        countries[country_name][yearNum] = {};
+                        countries[country_name][yearNum][dataset_name] = country.payload;
                     }
                 }
             });
@@ -166,7 +176,8 @@ var YearsSlider = function (_React$Component2) {
             _this3.setState({
                 min: min,
                 max: Math.max.apply(Math, years),
-                value: min
+                value: min,
+                country: country_name
             });
         };
 
@@ -175,12 +186,24 @@ var YearsSlider = function (_React$Component2) {
             _this3.setState({
                 value: slider.value
             });
+            var county_name = _this3.state.country;
+            var country_data = JSON.parse(localStorage.getItem('countries'))[county_name];
+            var year_data = country_data[slider.value];
+
+            var textAreaTitle = document.getElementById('text-area-title').innerHTML = county_name;
+
+            var textAreaString = '';
+            Object.entries(year_data).forEach(function (values) {
+                textAreaString += '{}: {} \n \n'.format(values[0], values[1]);
+            });
+            var textArea = document.getElementById('text-area').innerHTML = textAreaString;
         };
 
         _this3.state = {
             min: 0,
             max: 100,
-            value: 0
+            value: 0,
+            country: null
         };
         return _this3;
     }
@@ -212,36 +235,3 @@ var YearsSlider = function (_React$Component2) {
 
 var selectionBox = document.querySelector('#selection-box');
 ReactDOM.render(React.createElement(SelectionBox, null), selectionBox);
-
-var TextArea = function (_React$Component3) {
-    _inherits(TextArea, _React$Component3);
-
-    function TextArea(props) {
-        _classCallCheck(this, TextArea);
-
-        var _this4 = _possibleConstructorReturn(this, (TextArea.__proto__ || Object.getPrototypeOf(TextArea)).call(this, props));
-
-        _this4.state = {};
-        return _this4;
-    }
-
-    _createClass(TextArea, [{
-        key: 'render',
-        value: function render() {
-            return React.createElement(
-                'div',
-                { className: 'TextArea' },
-                React.createElement(
-                    'p',
-                    null,
-                    'PLACEHOLDER DOG'
-                )
-            );
-        }
-    }]);
-
-    return TextArea;
-}(React.Component);
-
-var textArea = document.querySelector('#text-area');
-ReactDOM.render(React.createElement(TextArea, null), textArea);
