@@ -8,7 +8,8 @@
     "debug-win": "set DEBUG=myapp:* & npm start",
     "babel-edit": "npx babel --watch  src --out-dir public/js --presets react-app/prod",
     "babel": "npx babel src --out-dir public/js --presets react-app/prod",
-    "deploy": "npm run babel & npm start"
+    "sass": "sass public/sass:public/css",
+    "deploy": "npm run babel & npm run sass & npm start"
   },
   "dependencies": {
     "babel-cli": "^6.26.0",
